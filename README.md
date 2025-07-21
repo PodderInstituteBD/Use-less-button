@@ -7,7 +7,7 @@ This is a minimal one-page web app designed to demonstrate server-side rendering
 
 ## 🚀 Live Demo
 
-🌍 [Visit the Live App on Render](https://your-app-name.onrender.com)
+ http://127.0.0.1:5000
 
 ---
 
