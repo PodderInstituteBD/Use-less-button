@@ -1,41 +1,400 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Web App 🌐</title>
+  <title>Tap Challenge - TerminalThree</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+    }
+
+    #settingsBtn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    #settingsMenu {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      background: rgba(0,0,0,0.8);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    #settingsMenu button {
+      display: block;
+      margin: 10px 0;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #64dd17;
+      color: white;
+      cursor: pointer;
+    }
+
+    #loginForm {
+      display: none;
+      position: absolute;
+      top: 20%;
+      background: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 15px;
+      color: #000;
+      text-align: left;
+      z-index: 10;
+    }
+
+    #loginForm input {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      width: 100%;
+    }
+
+    #creator {
+      font-size: 1.1rem;
+      color: #ccc;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    #score, #timer, #level-label, #task-label {
+      font-size: 2rem;
+      margin: 10px 0;
+      display: none;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      font-size: 1.3rem;
+      border: none;
+      border-radius: 50px;
+      margin: 8px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(to right, #00c853, #64dd17);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.07);
+    }
+
+    #mode-selection, #level-selector {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #level-slides {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      width: 90%;
+      margin-top: 20px;
+    }
+
+    .slide {
+      min-width: 100%;
+      display: flex;
+      flex-direction: column;
+      scroll-snap-align: center;
+    }
+
+    .level-row {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .level-btn {
+      position: relative;
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 1rem;
+      background-color: #ff6f00;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+    }
+
+    .level-btn.locked {
+      background-color: #444;
+      cursor: not-allowed;
+    }
+
+    .level-btn .icon {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.8);
+      color: black;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
     }
-    h1 {
-      color: #333;
-      font-size: 3rem;
+
+    #watermark {
+      position: fixed;
+      bottom: 10px;
+      right: 15px;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.15);
+      font-weight: bold;
+      pointer-events: none;
+      user-select: none;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
+
+    #next-btn {
+      display: none;
+      background: linear-gradient(to right, #ff6f00, #ff8f00);
     }
-    button:hover {
-      background: #45a049;
+
+    #task-label {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2rem;
+      background: rgba(255,255,255,0.1);
+      padding: 8px 16px;
+      border-radius: 12px;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <h1>Hello, Web World! 👋</h1>
-  <button onclick="alert('🚀 You clicked the button!')">Click Me</button>
+
+  <button id="settingsBtn" onclick="toggleSettings()">⚙️</button>
+  <div id="settingsMenu">
+    <button onclick="resetGame()">🔄 Reset Game</button>
+    <button onclick="showModes()">🏠 Back to Home</button>
+    <button onclick="toggleLogin()">🔐 Login</button>
+    <button onclick="toggleTheme()">🌓 Toggle Theme</button>
+    <button onclick="alert('Sound & notifications coming soon!')">🔊 Sound (Coming Soon)</button>
+  </div>
+
+  <div id="loginForm">
+    <h3>Login</h3>
+    <input type="text" id="username" placeholder="Enter username" />
+    <input type="password" id="password" placeholder="Enter password" />
+    <button onclick="submitLogin()">✅ Submit</button>
+    <button onclick="toggleLogin()">❌ Cancel</button>
+  </div>
+
+  <h1>🚀 Tap Challenge Game</h1>
+  <div id="creator">Created by TerminalThree</div>
+  <div id="task-label"></div>
+  <div id="score">Score: 0</div>
+  <div id="timer">Time: 0s</div>
+  <div id="level-label"></div>
+
+  <button class="btn" onclick="showModes()" id="playBtn">▶️ Play</button>
+  <div id="mode-selection">
+    <button class="btn" onclick="startGame('free')">🆓 Free Mode</button>
+    <button class="btn" onclick="showLevelSelector()">🎯 Level Mode</button>
+  </div>
+
+  <div id="level-selector">
+    <div id="level-slides"></div>
+  </div>
+
+  <button class="btn" onclick="increaseScore()" id="tapBtn" style="display:none;">🔥 Tap</button>
+  <button class="btn" id="next-btn" onclick="nextLevel()">➡️ Next Level</button>
+
+  <div id="watermark">TerminalThree</div>
+
+  <script>
+    let score = 0;
+    let time = 0;
+    let timerInterval;
+    let currentMode = "";
+    let currentLevel = 1;
+    const completedLevels = [1];
+    const totalLevels = 20;
+
+    const levelSettings = Array.from({ length: totalLevels }, (_, i) => ({
+      time: 10 + i,
+      score: 5 + i * 2,
+      task: `Level ${i+1} Task: Tap at least ${5 + i * 2} times in ${10 + i} seconds.`
+    }));
+
+    function toggleSettings() {
+      const menu = document.getElementById("settingsMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function toggleLogin() {
+      const form = document.getElementById("loginForm");
+      form.style.display = form.style.display === "block" ? "none" : "block";
+    }
+
+    function submitLogin() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user && pass) {
+        alert(`Welcome, ${user}!`);
+        toggleLogin();
+      } else {
+        alert("Please fill in both fields.");
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.style.background.includes("1e3c72");
+      document.body.style.background = isDark ? "linear-gradient(135deg, #ffffff, #e0e0e0)" : "linear-gradient(135deg, #1e3c72, #2a5298)";
+      document.body.style.color = isDark ? "#000" : "#fff";
+    }
+
+    function resetGame() {
+      completedLevels.length = 1;
+      alert("Progress reset. Only Level 1 unlocked now.");
+      showLevelSelector();
+    }
+
+    function showModes() {
+      document.getElementById("playBtn").style.display = "none";
+      document.getElementById("mode-selection").style.display = "flex";
+      document.getElementById("settingsMenu").style.display = "none";
+    }
+
+    function showLevelSelector() {
+      document.getElementById("mode-selection").style.display = "none";
+      document.getElementById("level-selector").style.display = "flex";
+      buildLevelSlides();
+    }
+
+    function buildLevelSlides() {
+      const container = document.getElementById("level-slides");
+      container.innerHTML = "";
+
+      for (let slide = 0; slide < 2; slide++) {
+        const slideDiv = document.createElement("div");
+        slideDiv.className = "slide";
+
+        for (let row = 0; row < 2; row++) {
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "level-row";
+
+          for (let col = 0; col < 5; col++) {
+            const level = slide * 10 + row * 5 + col + 1;
+            if (level > totalLevels) break;
+            const btn = document.createElement("button");
+            btn.className = "level-btn";
+            btn.innerText = `Level ${level}`;
+
+            if (!completedLevels.includes(level)) {
+              btn.classList.add("locked");
+              const lock = document.createElement("span");
+              lock.className = "icon";
+              lock.innerText = "🔒";
+              btn.appendChild(lock);
+              btn.disabled = true;
+            } else {
+              const star = document.createElement("span");
+              star.className = "icon";
+              star.innerText = "⭐";
+              btn.appendChild(star);
+            }
+
+            btn.onclick = () => startLevel(level);
+            rowDiv.appendChild(btn);
+          }
+          slideDiv.appendChild(rowDiv);
+        }
+        container.appendChild(slideDiv);
+      }
+    }
+
+    function startLevel(level) {
+      currentLevel = level;
+      score = 0;
+      time = 0;
+      document.getElementById("creator").style.display = "none";
+      document.getElementById("level-selector").style.display = "none";
+      document.getElementById("tapBtn").style.display = "inline-block";
+      document.getElementById("score").style.display = "block";
+      document.getElementById("timer").style.display = "block";
+      document.getElementById("level-label").style.display = "block";
+      document.getElementById("task-label").style.display = "block";
+      document.getElementById("score").innerText = "Score: 0";
+      document.getElementById("timer").innerText = "Time: 0s";
+
+      const settings = levelSettings[level - 1];
+      document.getElementById("level-label").innerText = `🎯 Level ${level}`;
+      document.getElementById("task-label").innerText = settings.task;
+
+      document.getElementById("tapBtn").disabled = false;
+      document.getElementById("next-btn").style.display = "none";
+
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        time++;
+        document.getElementById("timer").innerText = "Time: " + time + "s";
+
+        if (time >= settings.time) {
+          clearInterval(timerInterval);
+          document.getElementById("tapBtn").disabled = true;
+
+          if (score >= settings.score) {
+            document.getElementById("level-label").innerText = `✅ Level ${level} Complete!`;
+            document.getElementById("next-btn").style.display = "inline-block";
+            if (!completedLevels.includes(level)) {
+              completedLevels.push(level);
+            }
+          } else {
+            document.getElementById("level-label").innerText = `❌ Level ${level} Failed!`;
+          }
+        }
+      }, 1000);
+    }
+
+    function nextLevel() {
+      currentLevel++;
+      if (currentLevel <= totalLevels) {
+        startLevel(currentLevel);
+      } else {
+        document.getElementById("level-label").innerText = "🏁 All 20 Levels Completed!";
+        document.getElementById("next-btn").style.display = "none";
+        document.getElementById("task-label").innerText = "Great job! You've completed the challenge!";
+      }
+    }
+
+    function increaseScore() {
+      score++;
+      document.getElementById("score").innerText = "Score: " + score;
+    }
+  </script>
 </body>
 </html>
